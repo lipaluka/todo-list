@@ -1,19 +1,19 @@
-from src.storage import JsonTaskStorage
+from src.app import TodoApp
+from src.storage import JsonTaskStorage, StorageError
 from src.task_manager import TaskManager
 
 
 def main() -> None:
     storage = JsonTaskStorage("tasks.json")
-    manager = TaskManager(storage.load())
-    print(f"Loaded {len(manager.get_all())} task(s) from file.\n")
 
-    manager.add_task("Čaša vode")  # test for Croatian characters
-    manager.complete_task(1)
+    try:
+        manager = TaskManager(storage.load())
+    except StorageError as error:
+        print(f"Error: {error}")
+        return
 
-    for task in manager.get_all():
-        print(task)
-
-    storage.save(manager.get_all())
+    app = TodoApp(manager, storage)
+    app.run()
 
 
 if __name__ == "__main__":
