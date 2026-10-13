@@ -1,28 +1,19 @@
-from src.task_manager import TaskManager, TaskNotFoundError
+from src.storage import JsonTaskStorage
+from src.task_manager import TaskManager
 
 
 def main() -> None:
-    manager = TaskManager()
-    manager.add_task("Buy milk")
-    manager.add_task("Learn Python OOP")
-    manager.add_task("Push project to GitHub")
+    storage = JsonTaskStorage("tasks.json")
+    manager = TaskManager(storage.load())
+    print(f"Loaded {len(manager.get_all())} task(s) from file.\n")
 
-    manager.complete_task(2)
+    manager.add_task("Čaša vode")  # test for Croatian characters
+    manager.complete_task(1)
 
-    print("All tasks:")
     for task in manager.get_all():
         print(task)
 
-    print("\nPending tasks:")
-    for task in manager.get_all(only_pending=True):
-        print(task)
-
-    manager.remove_task(1)
-
-    try:
-        manager.remove_task(99)
-    except TaskNotFoundError as error:
-        print(f"\nError: {error}")
+    storage.save(manager.get_all())
 
 
 if __name__ == "__main__":
